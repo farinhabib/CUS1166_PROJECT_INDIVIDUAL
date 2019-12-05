@@ -1,7 +1,7 @@
 from flask import render_template,  redirect, url_for
 from app.main import bp
 from app import db
-from app.main.forms import TaskForm, Appointment
+from app.main.forms import TaskForm, AppointmentForm
 from app.models import Task, Appointment
 
 # Main route of the applicaitons.
@@ -74,70 +74,67 @@ def edit_task(task_id):
     return render_template("main/todolist_edit_view.html",form=form, task_id = task_id)
 
 
-@bp.route('/CreateAppointment', methods=['GET', 'POST'])
-def Appointment():
-    form = Appointment()
+
+@bp.route('/appointmentlist', methods=['GET','POST'])
+def appointmentlist():
+    form = AppointmentForm()
 
     if form.validate_on_submit():
-        new_appointment = Appointment()
 
+        new_appointment = Appointment()
         new_appointment.appointment_title = form.appointment_title.data
-        new_appointment.appointment_date = form.appointment_date.data
-        new_appointment.appointment_time = form.appointment_time.data
-        new_appointment.location_address = form.location_address.data
-        new_appointment.customer_name = form.customer_name.data
         new_appointment.appointment_status = form.appointment_status_completed.data
+        new_appointment.appointment_date = form.appointment_date.data
+        new_appointment.start_time = form.start_time.data
+        new_appointment.duration = form.duration.data
+        new_appointment.location = form.location.data
+        new_appointment.customer_name = form.customer_name.data
+        new_appointment.notes = form.notes.data
 
         db.session.add(new_appointment)
         db.session.commit()
 
-        return redirect(url_for('main.appointment'))
-
+        return redirect(url_for('main.appointmentlist'))
 
     appointment_list = db.session.query(Appointment).all()
 
-    return render_template("main/appointmentlist.html",todo_list = appointment_list,form= form)
+    return render_template("main/appointmentlist.html", appointment_list=appointment_list, form=form)
 
 
-bp.route('/appointmentlist/edit/<int:appointment_id>', methods=['GET','POST'])
-def edit_Appointment(appointment_id):
-    form = Appointment()
-    print(form.validate_on_submit())
-    if form.validate_on_submit():
-
-        current_appointment = Appointment.query.filter_by(appointment_id=appointment_id).first_or_404()
-        current_appointment.appointment_title = form.appointment_title.data
-        current_appointment.appointment_date = form.appointment_date.data
-        current_appointment.appointment_time = form.appointment_time.data
-        current_appointment.location_address = form.location_address.data
-        current_appointment.customer_name = form.customer_name.data
-        current_appointment.appointment_status = form.appointment_status_completed.data
-
-
-        db.session.add(current_appointment)
-        db.session.commit()
-        # After editing, redirect to the view page.
-        return redirect(url_for('main.appointment'))
-
-    current_appointment = Appointment.query.filter_by(appointment_id=appointment_id).first_or_404()
-
-    form.appointment_title.data = current_appointment.appointment_title
-    form.appointment_date.data = current_appointment.appointment_date
-    form.appointment_time.data = current_appointment.appointment_time
-    form.location_address.data = current_appointment.location_address
-    form.customer_name.data = current_appointment.customer_name
-
-
-    return render_template("main/appointment_edit_view.html",form=form, appointment_id = appointment_id)
-
-@bp.route('/Appointment/remove/<int:appointment_id>', methods=['GET','POST'])
-def delete_appointment(appointment_id):
-
+@bp.route('/appointmentlist/remove/<int:appointment_id>', methods=['GET','POST'])
+def remove_appointment(appointment_id):
 
     Appointment.query.filter(Appointment.appointment_id == appointment_id).delete()
     db.session.commit()
 
-    return redirect(url_for('main.appointment'))
+    return redirect(url_for('main.appointmentlist'))
 
 
-#
+@bp.route('/appointmentlist/edit/<int:appointment_id>', methods=['GET','POST'])
+def edit_appointment(appointment_id):
+    form = AppointmentForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        # Get the data from the form, and add it to the database.
+
+        current_appointment = Appointment.query.filter_by(appointment_id=appointment_id).first_or_404()
+        current_appointment.title = form.appointment_title.data
+        current_appointment.appointment_status = form.appointment_status_completed.data
+        current_appointment.appointment_date = form.appointment_date.data
+        current_appointment.start_time = form.start_time.data
+        current_appointment.duration = form.duration.data
+        current_appointment.location = form.location.data
+        current_appointment.customer_name = form.customer_name.data
+        current_appointment.notes = form.notes.data
+
+        db.session.add(current_appointment)
+        db.session.commit()
+
+        return redirect(url_for('main.appointmentlist'))
+
+    current_appointment = Appointment.query.filter_by(appointment_id=appointment_id).first_or_404()
+
+    form.appointment_title.data = current_appointment.appointment_title
+    form.appointment_status_completed.data = current_appointment.appointment_status
+
+    return render_template("main/appointmentlist_edit_view.html", form=form, appointment_id=appointment_id)

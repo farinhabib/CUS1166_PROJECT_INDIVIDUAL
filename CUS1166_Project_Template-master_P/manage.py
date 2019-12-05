@@ -1,7 +1,7 @@
 #from flask.ext.script import Manager, prompt_bool, Shell, Server
 from flask_script import Manager, prompt_bool, Shell, Server
 
-from app import db, models, create_app
+from app import db, create_app
 
 #from app import create_app
 

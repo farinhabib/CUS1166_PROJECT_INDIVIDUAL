@@ -2,16 +2,19 @@
 #from flask import url_for
 from app import db
 
-class Appointment(db.model):
 
+class Appointment(db.Model):
 
     appointment_id = db.Column(db.Integer, primary_key=True)
-    appointment_title = db.Column(db.Title, index=True)
+    appointment_title = db.Column(db.String(128), index=True)
     appointment_date = db.Column(db.Date, index=True)
-    appointment_time = db.Column(db.Time, index=True)
-    location_address = db.Column(db.Adress, index=True)
-    customer_name = db.Column(db.Name, index=True)
+    start_time = db.Column(db.Time, index=True)
+    duration = db.Column(db.Time, index= True)
+    location = db.Column(db.String(128), index=True)
+    customer_name = db.Column(db.String(128), index=True)
     appointment_status = db.Column(db.String(128))
+    notes = db.Column(db.String(128), index=True)
+
 
 class Task(db.Model):
 

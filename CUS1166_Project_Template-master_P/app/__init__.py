@@ -1,6 +1,5 @@
 from flask import Flask, current_app
-#
-from app import models
+
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
